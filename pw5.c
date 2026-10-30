@@ -1,18 +1,36 @@
 #include <stdio.h>
-#include <math.h>
 
-// double, а не float, потому что он точнее и ошибка округления меньше
-// return завершает функцию, передает в main вычисленное значение
-// и возвращает управление туда, откуда функцию вызвали
-double calc(double a, double b){
-    return a * b / sqrt(a * a + b * b);
+#define A 0.0
+#define B 5.0
+#define H 1.0
+
+// ln считаем сами по формуле
+// формула: ln(z) = 2 * (t + t^3/3 + t^5/5 + ...), где t = (z - 1) / (z + 1)
+double my_ln(double z){
+    double t = (z - 1) / (z + 1);
+    double t2 = t * t;
+    double term = t;
+    double sum = 0.0;
+    int k;
+    for (k = 1; k <= 400; k += 2){
+        sum += term / k;
+        term *= t2;
+    }
+    return 2 * sum;
 }
+
 int main(void){
-    double a, b;
-    printf("Введи a и b: ");
-    while (scanf("%lf %lf", &a, &b)==2){
-        printf("Результат: %.4f\n", calc(a, b));
-        printf("Введи a и b: ");
+    double x, y;
+    int n = 1;
+    // при x += H копится ошибка округления, потому что числа вроде 0.1
+    // хранятся в двоичном виде неточно, из-за этого x может не дойти до B,
+    // например получится 5.0000001 и последняя точка пропадет
+    // у нас H = 1.0 хранится точно, поэтому все точки выведутся
+    printf(" N        X         Y\n");
+    for (x = A; x <= B; x += H){
+        y = my_ln(x + 1);
+        printf("%2d   %8.4f  %8.4f\n", n, x, y);
+        n++;
     }
     return 0;
 }

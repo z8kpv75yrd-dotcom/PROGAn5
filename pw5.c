@@ -1,36 +1,29 @@
 #include <stdio.h>
 
-#define A 0.0
-#define B 5.0
-#define H 1.0
-
-// ln считаем сами по формуле
-// формула: ln(z) = 2 * (t + t^3/3 + t^5/5 + ...), где t = (z - 1) / (z + 1)
-double my_ln(double z){
-    double t = (z - 1) / (z + 1);
-    double t2 = t * t;
-    double term = t;
-    double sum = 0.0;
+// корень считаем сами
+// метод Ньютона: каждый раз r = (r + v / r) / 2, и r подходит все ближе к корню
+double my_sqrt(double v){
+    double r = v + 1;
     int k;
-    for (k = 1; k <= 400; k += 2){
-        sum += term / k;
-        term *= t2;
+    for (k = 1; k <= 100; k++){
+        r = (r + v / r) / 2;
     }
-    return 2 * sum;
+    return r;
+}
+
+// double, а не float, потому что он точнее и ошибка округления меньше
+// return завершает функцию, передает в main вычисленное значение
+// и возвращает управление туда, откуда функцию вызвали
+double calc(double a, double b){
+    return a * b / my_sqrt(a * a + b * b);
 }
 
 int main(void){
-    double x, y;
-    int n = 1;
-    // при x += H копится ошибка округления, потому что числа вроде 0.1
-    // хранятся в двоичном виде неточно, из-за этого x может не дойти до B,
-    // например получится 5.0000001 и последняя точка пропадет
-    // у нас H = 1.0 хранится точно, поэтому все точки выведутся
-    printf(" N        X         Y\n");
-    for (x = A; x <= B; x += H){
-        y = my_ln(x + 1);
-        printf("%2d   %8.4f  %8.4f\n", n, x, y);
-        n++;
+    double a, b;
+    printf("Введи a и b: ");
+    while (scanf("%lf %lf", &a, &b)==2){
+        printf("Результат: %.4f\n", calc(a, b));
+        printf("Введи a и b: ");
     }
     return 0;
 }
